@@ -17,9 +17,9 @@ From the repository root, on an x86-64 Docker host:
 
 ```sh
 docker buildx build --platform linux/arm64 --load \
-  -t ghcr.io/reckless-corp/uno-q-hat:dev containers/uno-q-hat
-python3 -B -m unittest discover -s containers/uno-q-hat/tests -v
-docker compose -f containers/uno-q-hat/docker-compose.yml config --quiet
+  -t ghcr.io/reckless-corp/uno-q-hat:dev uno-q-hat
+python3 -B -m unittest discover -s uno-q-hat/tests -v
+docker compose -f uno-q-hat/docker-compose.yml config --quiet
 ```
 
 The native build stages cross-compile Cortex-M firmware, ARM64 OpenOCD, and the
@@ -46,7 +46,7 @@ docker save -o /tmp/uno-q-hat.tar ghcr.io/reckless-corp/uno-q-hat:dev
 adb -s 3ac9982a push /tmp/uno-q-hat.tar /var/tmp/uno-q-hat.tar
 adb -s 3ac9982a shell docker load -i /var/tmp/uno-q-hat.tar
 adb -s 3ac9982a shell mkdir -p /var/tmp/uno-q-hat
-adb -s 3ac9982a push containers/uno-q-hat/docker-compose.yml /var/tmp/uno-q-hat/
+adb -s 3ac9982a push uno-q-hat/docker-compose.yml /var/tmp/uno-q-hat/
 ```
 
 For local testing, tag the loaded image with the compose file's untagged name:
@@ -264,8 +264,8 @@ A failure can leave the MCU halted until a successful retry or reset.
 ## CI and status
 
 The repository workflow publishes `uno-q-hat` and `uno-q-hat-app` for ARM64 only,
-pins the container digest in the composeapp, and includes it only with UNO Q
-update artifacts. The existing Matrix app remains available for both machines.
+pins the container digest in the composeapp, and uploads the published app URI.
+The Matrix app is published for both AMD64 and ARM64.
 
 The one-shot `install`, `verify`, `backup`, and `restore` commands exit zero on
 success and nonzero on failure. Compose runs `serve`: initialize once, then run
