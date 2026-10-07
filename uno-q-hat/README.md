@@ -150,6 +150,43 @@ resetting the MCU starts with the hat until Linux restores the desired settings.
 An interrupted request may have executed even if its response was lost. Retrying
 a client `ANIM` command restarts the animation with its full repeat count.
 
+### Ready-to-run animations
+
+The composeapp bundle includes two host shell scripts in `animations/`:
+
+- `scanner.sh`: a two-column bar sweeps across the matrix and back.
+- `heartbeat.sh`: a heart expands twice, then rests between double beats.
+
+On the host, from the deployment's compose directory, switch animations by
+running either script against the existing service:
+
+```sh
+./animations/scanner.sh
+./animations/heartbeat.sh
+# Play five double beats, then hold the small heart:
+./animations/heartbeat.sh 5
+# Return to the cowboy hat:
+docker compose -p uno-q-hat exec -T hat uno-q-hatctl SHOW HAT
+```
+
+The scripts use `docker compose exec -T` and locate the bundled compose file
+relative to their own path, so they can also be invoked from another directory.
+They default to project `uno-q-hat`; for another deployment, run
+`COMPOSE_PROJECT_NAME=your-project ./animations/scanner.sh`. The host needs
+Docker Compose and permission to access Docker. `.composeappignores` includes
+the scripts in the published bundle; no container image rebuild is needed.
+
+Each script defaults to infinite playback (`0`); an optional argument sets the
+repeat count. It uploads all frames in one `ANIM` command, turns the display on
+after a successful upload, and exits. Running another script replaces the current
+animation. Controller restarts restore the hat, as described above.
+
+To make your own animation, copy a script in `animations/`, edit its frame hex
+and millisecond durations, then run it directly from the host. The heart script includes
+pixel drawings beside its frames; the frame encoding is documented below.
+These are monochrome shape animations, so the heartbeat changes size rather
+than brightness. Visual appearance still needs checking on the board.
+
 ### Local socket API
 
 The `control-socket` volume contains `/run/uno-q-hat/control.sock`, a Unix stream
