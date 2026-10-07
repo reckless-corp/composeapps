@@ -37,8 +37,8 @@ app_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 # ....#####....
 # .....###.....
 # ......#......
-docker compose -f "$app_dir/docker-compose.yml" -p "${COMPOSE_PROJECT_NAME:-uno-q-hat}" \
-    exec -T hat uno-q-hatctl ANIM "${1:-0}" \
+docker compose -f "$app_dir/docker-compose.yml" -p "${COMPOSE_PROJECT_NAME:-led-matrix-anim}" \
+    exec -T matrix led-matrix-animctl ANIM "${1:-0}" \
     120:1c07be0ffe0ffc07f803f001e0004000 \
     100:0000b803f803f803f001e00040000000 \
     120:1c07be0ffe0ffc07f803f001e0004000 \
@@ -46,5 +46,5 @@ docker compose -f "$app_dir/docker-compose.yml" -p "${COMPOSE_PROJECT_NAME:-uno-
     700:00000000b001f001e000400000000000
 
 # Make the new animation visible even if DISPLAY OFF was used earlier.
-exec docker compose -f "$app_dir/docker-compose.yml" -p "${COMPOSE_PROJECT_NAME:-uno-q-hat}" \
-    exec -T hat uno-q-hatctl DISPLAY ON
+exec docker compose -f "$app_dir/docker-compose.yml" -p "${COMPOSE_PROJECT_NAME:-led-matrix-anim}" \
+    exec -T matrix led-matrix-animctl DISPLAY ON

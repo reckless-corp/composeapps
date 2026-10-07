@@ -29,7 +29,7 @@ if [ "$MCU_OPERATION" = backup ]; then
     dd if=/dev/zero of="$MCU_BACKUP" bs=1048576 count=2 2>/dev/null
 fi
 ''')
-        self.script("uno-q-hatctl", '#!/bin/sh\necho controller >> "$CALLS"\n')
+        self.script("led-matrix-animctl", '#!/bin/sh\necho controller >> "$CALLS"\n')
         self.script("sleep", '#!/bin/sh\necho idle >> "$CALLS"\n')
         self.env = dict(os.environ, PATH=f"{self.bin}:{os.environ['PATH']}",
                         MCU_STATE_DIR=str(self.state), MCU_BOARD_DIR=str(board),

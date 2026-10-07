@@ -1,7 +1,7 @@
-# UNO Q cowboy hat
+# UNO Q LED matrix animations
 
-A standalone Zephyr application draws a 13×8 cowboy hat on the UNO Q's STM32
-LED matrix. An ARM64 container installs it through the Qualcomm processor's
+A standalone Zephyr application plays animations on the UNO Q's 13×8 STM32
+LED matrix, with a cowboy hat as its default image. An ARM64 container installs it through the Qualcomm processor's
 GPIO/SWD connection. Once started, the MCU drives the LEDs independently.
 After installation, a small Linux controller communicates with the MCU over its
 internal UART. Docker restarts the service at boot to initialize the MCU boot pin,
@@ -17,9 +17,9 @@ From the repository root, on an x86-64 Docker host:
 
 ```sh
 docker buildx build --platform linux/arm64 --load \
-  -t ghcr.io/reckless-corp/uno-q-hat:dev uno-q-hat
-python3 -B -m unittest discover -s uno-q-hat/tests -v
-docker compose -f uno-q-hat/docker-compose.yml config --quiet
+  -t ghcr.io/reckless-corp/led-matrix-anim:dev led-matrix-anim
+python3 -B -m unittest discover -s led-matrix-anim/tests -v
+docker compose -f led-matrix-anim/docker-compose.yml config --quiet
 ```
 
 The native build stages cross-compile Cortex-M firmware, ARM64 OpenOCD, and the
@@ -42,27 +42,27 @@ equivalent SSH commands). Replace `3ac9982a` with the output of `adb devices`.
 Copy the image and compose file:
 
 ```sh
-docker save -o /tmp/uno-q-hat.tar ghcr.io/reckless-corp/uno-q-hat:dev
-adb -s 3ac9982a push /tmp/uno-q-hat.tar /var/tmp/uno-q-hat.tar
-adb -s 3ac9982a shell docker load -i /var/tmp/uno-q-hat.tar
-adb -s 3ac9982a shell mkdir -p /var/tmp/uno-q-hat
-adb -s 3ac9982a push uno-q-hat/docker-compose.yml /var/tmp/uno-q-hat/
+docker save -o /tmp/led-matrix-anim.tar ghcr.io/reckless-corp/led-matrix-anim:dev
+adb -s 3ac9982a push /tmp/led-matrix-anim.tar /var/tmp/led-matrix-anim.tar
+adb -s 3ac9982a shell docker load -i /var/tmp/led-matrix-anim.tar
+adb -s 3ac9982a shell mkdir -p /var/tmp/led-matrix-anim
+adb -s 3ac9982a push led-matrix-anim/docker-compose.yml /var/tmp/led-matrix-anim/
 ```
 
 For local testing, tag the loaded image with the compose file's untagged name:
 
 ```sh
-adb -s 3ac9982a shell docker tag ghcr.io/reckless-corp/uno-q-hat:dev ghcr.io/reckless-corp/uno-q-hat:latest
+adb -s 3ac9982a shell docker tag ghcr.io/reckless-corp/led-matrix-anim:dev ghcr.io/reckless-corp/led-matrix-anim:latest
 ```
 
 Run a backup first. All commands below run on the board in
-`/var/tmp/uno-q-hat`, using the same compose project name so they share state:
+`/var/tmp/led-matrix-anim`, using the same compose project name so they share state:
 
 ```sh
-docker compose -p uno-q-hat run --rm --no-deps hat backup
-docker compose -p uno-q-hat up -d --no-build --pull never --wait --wait-timeout 360
-docker compose -p uno-q-hat logs hat
-docker compose -p uno-q-hat run --rm --no-deps hat verify
+docker compose -p led-matrix-anim run --rm --no-deps matrix backup
+docker compose -p led-matrix-anim up -d --no-build --pull never --wait --wait-timeout 360
+docker compose -p led-matrix-anim logs matrix
+docker compose -p led-matrix-anim run --rm --no-deps matrix verify
 ```
 
 Installation also creates a backup automatically if none exists. It validates
@@ -86,20 +86,20 @@ Run commands on the board against the running service (from the deployment's
 compose directory):
 
 ```sh
-docker compose -p uno-q-hat exec -T hat uno-q-hatctl HELLO
-docker compose -p uno-q-hat exec -T hat uno-q-hatctl PING
-docker compose -p uno-q-hat exec -T hat uno-q-hatctl DISPLAY OFF
-docker compose -p uno-q-hat exec -T hat uno-q-hatctl DISPLAY ON
-docker compose -p uno-q-hat exec -T hat uno-q-hatctl SHOW HAT
+docker compose -p led-matrix-anim exec -T matrix led-matrix-animctl HELLO
+docker compose -p led-matrix-anim exec -T matrix led-matrix-animctl PING
+docker compose -p led-matrix-anim exec -T matrix led-matrix-animctl DISPLAY OFF
+docker compose -p led-matrix-anim exec -T matrix led-matrix-animctl DISPLAY ON
+docker compose -p led-matrix-anim exec -T matrix led-matrix-animctl SHOW HAT
 # Light all 104 pixels:
-docker compose -p uno-q-hat exec -T hat uno-q-hatctl FRAME ff1fff1fff1fff1fff1fff1fff1fff1f
+docker compose -p led-matrix-anim exec -T matrix led-matrix-animctl FRAME ff1fff1fff1fff1fff1fff1fff1fff1f
 ```
 
 To blink a plus sign on for 500 ms and off for 500 ms, upload the complete
 animation in one command:
 
 ```sh
-docker compose -p uno-q-hat exec -T hat uno-q-hatctl ANIM 0 \
+docker compose -p led-matrix-anim exec -T matrix led-matrix-animctl ANIM 0 \
   500:000040004000f8034000400000000000 \
   500:00000000000000000000000000000000
 ```
@@ -166,12 +166,12 @@ running either script against the existing service:
 # Play five double beats, then hold the small heart:
 ./animations/heartbeat.sh 5
 # Return to the cowboy hat:
-docker compose -p uno-q-hat exec -T hat uno-q-hatctl SHOW HAT
+docker compose -p led-matrix-anim exec -T matrix led-matrix-animctl SHOW HAT
 ```
 
 The scripts use `docker compose exec -T` and locate the bundled compose file
 relative to their own path, so they can also be invoked from another directory.
-They default to project `uno-q-hat`; for another deployment, run
+They default to project `led-matrix-anim`; for another deployment, run
 `COMPOSE_PROJECT_NAME=your-project ./animations/scanner.sh`. The host needs
 Docker Compose and permission to access Docker. `.composeappignores` includes
 the scripts in the published bundle; no container image rebuild is needed.
@@ -189,7 +189,7 @@ than brightness. Visual appearance still needs checking on the board.
 
 ### Local socket API
 
-The `control-socket` volume contains `/run/uno-q-hat/control.sock`, a Unix stream
+The `control-socket` volume contains `/run/led-matrix-anim/control.sock`, a Unix stream
 socket with mode `0660`, owned by the controller's UID/GID (root in this image).
 A second container can mount the same volume and connect with a compatible
 UID/GID. It needs neither UART/GPIO access nor network access. Share the directory,
@@ -272,15 +272,16 @@ and `backup.log` with option-register readings. Backups are verified against MCU
 memory before they are marked complete. The first completed backup is preserved
 across later upgrades; corrupted backups block installation. Option bytes are
 never modified by this application.
-The volume has the fixed Docker name `uno-q-hat_firmware-backup`, so local
-projects and the published `uno-q-hat-app` share the same original backup and lock.
+The volume retains the legacy Docker name `uno-q-hat_firmware-backup`, so
+existing installations, local projects, and the published `led-matrix-anim-app`
+share the same original backup and lock.
 Stop the local test project before enabling the published app: only one deployed
 service should own the MCU's desired firmware version.
 
 Export the backup off-board before experimental firmware changes:
 
 ```sh
-docker compose -p uno-q-hat run --rm --no-deps --entrypoint tar hat \
+docker compose -p led-matrix-anim run --rm --no-deps --entrypoint tar matrix \
   -C /state -cf - original.bin original.sha256 backup.log > original-mcu.tar
 ```
 
@@ -288,8 +289,8 @@ Keep that archive somewhere durable; removing the Docker volume loses the
 on-board recovery copy. To restore the original firmware from the volume:
 
 ```sh
-docker compose -p uno-q-hat stop hat
-docker compose -p uno-q-hat run --rm --no-deps hat restore
+docker compose -p led-matrix-anim stop matrix
+docker compose -p led-matrix-anim run --rm --no-deps matrix restore
 ```
 
 Stopping or uninstalling the composeapp does **not** stop or undo MCU firmware.
@@ -300,13 +301,13 @@ A failure can leave the MCU halted until a successful retry or reset.
 
 ## CI and status
 
-The repository workflow publishes `uno-q-hat` and `uno-q-hat-app` for ARM64 only,
+The repository workflow publishes `led-matrix-anim` and `led-matrix-anim-app` for ARM64 only,
 pins the container digest in the composeapp, and uploads the published app URI.
 The Matrix app is published for both AMD64 and ARM64.
 
 The one-shot `install`, `verify`, `backup`, and `restore` commands exit zero on
 success and nonzero on failure. Compose runs `serve`: initialize once, then run
-`uno-q-hatctl daemon`. Health runs a live `uno-q-hatctl PING` through the controller
+`led-matrix-animctl daemon`. Health runs a live `led-matrix-animctl PING` through the controller
 and UART, including protocol negotiation and state recovery when necessary.
 Installation failure leaves the service idle and unhealthy without retrying flash;
 inspect logs and explicitly restart it after correcting the problem. UART failures
@@ -350,9 +351,24 @@ and logs from development are kept in the ignored `.local/` directory; they are
 excluded from both Docker and composeapp publication. Visual appearance and a
 physical power-cycle still need confirmation at the board.
 
-The development deployment uses `/var/lib/uno-q-hat/projects/uno-q-hat/` on the
-board. Its pinned compose file can be used with `docker compose -p uno-q-hat -f
-/var/lib/uno-q-hat/projects/uno-q-hat/docker-compose.yml` for logs or maintenance.
+## Upgrading from uno-q-hat
+
+Stop and disable the old `uno-q-hat` deployment before starting `led-matrix-anim`,
+so only one controller owns the MCU UART. Keep the `uno-q-hat_firmware-backup`
+volume; do not remove it during migration. The renamed app reuses that backup
+and programming lock automatically.
+
+The image is now `ghcr.io/reckless-corp/led-matrix-anim`, the published composeapp
+is `ghcr.io/reckless-corp/led-matrix-anim-app`, and the Compose service is `matrix`.
+The controller command is now `led-matrix-animctl`; the default socket path is
+`/run/led-matrix-anim/control.sock`. Update external callers and containers that
+share the control socket to use the new project's `control-socket` volume and
+socket path. The `SHOW HAT` protocol command still selects the built-in image.
+
+The scripts default to the new project name `led-matrix-anim`. If you retain a
+custom project name, set `COMPOSE_PROJECT_NAME` when running them. Existing
+on-board deployment directories are not moved automatically; use the compose
+file path belonging to your actual deployment for logs or maintenance.
 
 Sources: [Zephyr UNO Q](https://docs.zephyrproject.org/latest/boards/arduino/uno_q/doc/index.html),
 [Arduino SWD configuration](https://github.com/arduino/meta-arduino/tree/master/meta-arduino-qcom/recipes-devtools/openocd/files/imola),

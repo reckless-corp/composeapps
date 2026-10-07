@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20.0)
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
-project(uno_q_hat)
+project(led_matrix_anim)
 target_sources(app PRIVATE src/main.c src/protocol.c src/animation.c)
 # Identify the application sources/configuration used for this firmware.
 set(fingerprint "")

@@ -19,11 +19,11 @@ class UARTTests(unittest.TestCase):
     def setUpClass(cls):
         cls.build = tempfile.TemporaryDirectory()
         cls.addClassCleanup(cls.build.cleanup)
-        cls.controller = str(Path(cls.build.name) / 'hatctl')
+        cls.controller = str(Path(cls.build.name) / 'matrixctl')
         cls.parser_test = str(Path(cls.build.name) / 'protocol-test')
         cls.animation_test = str(Path(cls.build.name) / 'animation-test')
         cls.read_line_test = str(Path(cls.build.name) / 'read-line-test')
-        for source, output in [(ROOT / 'controller/hatctl.c', cls.controller),
+        for source, output in [(ROOT / 'controller/matrixctl.c', cls.controller),
                                (ROOT / 'tests/read_line_test.c', cls.read_line_test),
                                (ROOT / 'tests/protocol_test.c', cls.parser_test),
                                (ROOT / 'tests/animation_test.c', cls.animation_test)]:

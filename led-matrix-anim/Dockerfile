@@ -70,8 +70,8 @@ FROM tools AS controller
 COPY controller /work/controller
 COPY firmware/src/protocol.c firmware/src/protocol.h /work/protocol/
 RUN aarch64-linux-gnu-gcc -std=c11 -Os -Wall -Wextra -Werror -I/work/protocol \
-    /work/controller/hatctl.c /work/protocol/protocol.c -o /work/uno-q-hatctl \
-    && aarch64-linux-gnu-strip /work/uno-q-hatctl
+    /work/controller/matrixctl.c /work/protocol/protocol.c -o /work/led-matrix-animctl \
+    && aarch64-linux-gnu-strip /work/led-matrix-animctl
 
 FROM ${BASE}
 # No target-architecture RUN instructions: an x86 builder needs no QEMU.
@@ -79,7 +79,7 @@ COPY --from=flasher /opt/openocd /opt/openocd
 COPY --from=flasher /runtime/lib /usr/local/lib
 COPY --from=flasher /runtime/share /usr/local/share
 COPY --from=flasher /runtime/gpio-check /usr/local/bin/uno-q-gpio-check
-COPY --from=controller /work/uno-q-hatctl /usr/local/bin/uno-q-hatctl
+COPY --from=controller /work/led-matrix-animctl /usr/local/bin/led-matrix-animctl
 COPY --from=firmware /work/build/zephyr/zephyr.elf /firmware/zephyr.elf
 COPY --from=firmware /work/build/zephyr/build-info.txt /firmware/build-info.txt
 COPY --from=firmware /work/licenses /usr/local/share/licenses/firmware
@@ -87,7 +87,7 @@ COPY Dockerfile /usr/local/share/src/Dockerfile
 COPY openocd /app/openocd
 COPY --chmod=755 install.sh /app/install.sh
 ENV LD_LIBRARY_PATH=/usr/local/lib PATH=/opt/openocd/bin:$PATH
-LABEL org.opencontainers.image.title="UNO Q cowboy hat" \
-      org.opencontainers.image.description="Standalone Zephyr firmware and boot-time SWD installer for Arduino UNO Q"
+LABEL org.opencontainers.image.title="UNO Q LED matrix animations" \
+      org.opencontainers.image.description="LED matrix animation controller, Zephyr firmware and SWD installer for Arduino UNO Q"
 ENTRYPOINT ["/app/install.sh"]
 CMD ["install"]

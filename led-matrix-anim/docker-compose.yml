@@ -1,6 +1,6 @@
 services:
-  hat:
-    image: ghcr.io/reckless-corp/uno-q-hat
+  matrix:
+    image: ghcr.io/reckless-corp/led-matrix-anim
     build: .
     platform: linux/arm64
     init: true
@@ -13,7 +13,7 @@ services:
     volumes:
       - /sys/firmware/devicetree/base:/board:ro
       - firmware-backup:/state
-      - control-socket:/run/uno-q-hat
+      - control-socket:/run/led-matrix-anim
     network_mode: none
     read_only: true
     tmpfs:
@@ -24,7 +24,7 @@ services:
       - no-new-privileges:true
     restart: unless-stopped
     healthcheck:
-      test: [CMD, uno-q-hatctl, PING]
+      test: [CMD, led-matrix-animctl, PING]
       interval: 10s
       timeout: 8s
       start_period: 5m
@@ -33,5 +33,5 @@ services:
 volumes:
   control-socket:
   firmware-backup:
-    # Preserve the original backup and operation lock across compose project names.
+    # Keep the legacy name to preserve the original backup and lock across upgrades.
     name: uno-q-hat_firmware-backup

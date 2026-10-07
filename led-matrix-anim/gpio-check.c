@@ -38,7 +38,7 @@ int main(int argc, char **argv)
 		 */
 		struct gpio_v2_line_request boot = {
 		    .offsets = {37},
-		    .consumer = "uno-q-hat-boot",
+		    .consumer = "led-matrix-anim-boot",
 		    .config = {.flags = GPIO_V2_LINE_FLAG_OUTPUT},
 		    .num_lines = 1,
 		};

@@ -23,7 +23,7 @@ jobs:
         include:
           - docker_dir: matrix
             target_platforms: linux/amd64,linux/arm64
-          - docker_dir: uno-q-hat
+          - docker_dir: led-matrix-anim
             target_platforms: linux/arm64
 
     steps:
@@ -76,8 +76,8 @@ jobs:
           - app: matrix
             images: matrix
             platforms: amd64,arm64
-          - app: uno-q-hat
-            images: uno-q-hat
+          - app: led-matrix-anim
+            images: led-matrix-anim
             platforms: arm64
     steps:
       - name: Checkout

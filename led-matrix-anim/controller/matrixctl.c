@@ -259,7 +259,7 @@ static int address(struct sockaddr_un *addr)
 {
 	memset(addr, 0, sizeof(*addr));
 	addr->sun_family = AF_UNIX;
-	const char *path = setting("MCU_SOCKET", "/run/uno-q-hat/control.sock");
+	const char *path = setting("MCU_SOCKET", "/run/led-matrix-anim/control.sock");
 	if (strlen(path) >= sizeof(addr->sun_path))
 		return -1;
 	strcpy(addr->sun_path, path);
@@ -390,7 +390,7 @@ int main(int argc, char **argv)
 	const char *error = hat_parse_client(command, &parsed, &animation);
 	if (argc < 2 || error) {
 		fprintf(stderr,
-			"Usage: uno-q-hatctl {HELLO|PING|SHOW HAT|DISPLAY "
+			"Usage: led-matrix-animctl {HELLO|PING|SHOW HAT|DISPLAY "
 			"ON|DISPLAY OFF|FRAME hex|ANIM repeats ms:hex "
 			"[...]|ANIM STOP|daemon}\n");
 		return 2;

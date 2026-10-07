@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-#define main hatctl_main
-#include "../controller/hatctl.c"
+#define main matrixctl_main
+#include "../controller/matrixctl.c"
 #undef main
 #include <assert.h>
 

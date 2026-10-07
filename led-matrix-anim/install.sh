@@ -7,8 +7,8 @@ case "$operation" in
         # A completed one-shot does not restart when Docker starts after boot.
         # Never loop over a failing flash attempt. UART recovery does not reflash.
         if sh "$0" install; then
-            mkdir -p "$(dirname "${MCU_SOCKET:-/run/uno-q-hat/control.sock}")"
-            exec uno-q-hatctl daemon
+            mkdir -p "$(dirname "${MCU_SOCKET:-/run/led-matrix-anim/control.sock}")"
+            exec led-matrix-animctl daemon
         else
             echo 'MCU installation failed; remaining unhealthy until manually restarted' >&2
         fi
