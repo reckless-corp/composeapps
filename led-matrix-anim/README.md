@@ -152,17 +152,19 @@ a client `ANIM` command restarts the animation with its full repeat count.
 
 ### Ready-to-run animations
 
-The composeapp bundle includes two host shell scripts in `animations/`:
+The composeapp bundle includes three host shell scripts in `animations/`:
 
 - `scanner.sh`: a two-column bar sweeps across the matrix and back.
 - `heartbeat.sh`: a heart expands twice, then rests between double beats.
+- `fireworks.sh`: a rocket rises, bursts into expanding sparks, then fades away.
 
 On the host, from the deployment's compose directory, switch animations by
-running either script against the existing service:
+running any script against the existing service:
 
 ```sh
 ./animations/scanner.sh
 ./animations/heartbeat.sh
+./animations/fireworks.sh
 # Play five double beats, then hold the small heart:
 ./animations/heartbeat.sh 5
 # Return to the cowboy hat:
