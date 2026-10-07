@@ -10,7 +10,7 @@ fi
 app_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 
 # A two-column bar sweeps left to right and back (80 ms per step).
-docker compose -f "$app_dir/docker-compose.yml" -p "${COMPOSE_PROJECT_NAME:-led-matrix-anim}" \
+docker compose -f "$app_dir/docker-compose.yml" -p "${COMPOSE_PROJECT_NAME:-led-matrix-anim-app}" \
     exec -T matrix led-matrix-animctl ANIM "${1:-0}" \
     80:03000300030003000300030003000300 \
     80:06000600060006000600060006000600 \
@@ -36,5 +36,5 @@ docker compose -f "$app_dir/docker-compose.yml" -p "${COMPOSE_PROJECT_NAME:-led-
     80:06000600060006000600060006000600
 
 # Make the new animation visible even if DISPLAY OFF was used earlier.
-exec docker compose -f "$app_dir/docker-compose.yml" -p "${COMPOSE_PROJECT_NAME:-led-matrix-anim}" \
+exec docker compose -f "$app_dir/docker-compose.yml" -p "${COMPOSE_PROJECT_NAME:-led-matrix-anim-app}" \
     exec -T matrix led-matrix-animctl DISPLAY ON
